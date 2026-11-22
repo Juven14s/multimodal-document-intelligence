@@ -28,4 +28,6 @@ jobs:
       - name: Lint
         run: python -m ruff check src tests scripts
       - name: Test
-        run: python -m pytest --basetemp=tmp/ci
+        run: |
+          python -c "from pathlib import Path; Path('tmp').mkdir(exist_ok=True)"
+          python -m pytest --basetemp=tmp/ci

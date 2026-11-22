@@ -48,6 +48,7 @@ acceptée par le contrat, mais son évaluation vient après la baseline reçus.
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev,api,ocr,ui]"
+New-Item -ItemType Directory -Path tmp -Force | Out-Null
 python -m pytest --basetemp=tmp/pytest
 ```
 
