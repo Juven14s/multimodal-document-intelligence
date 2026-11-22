@@ -1,0 +1,13 @@
+{
+  "corpus": "Five synthetic invoices reserved before changing the OCR rules",
+  "files": {
+    "invoice-holdout-balance-only.pdf": "2bcfef78908d9f1126af72e28a198e3cd8a5382bb170a5901155d415144fe3bf",
+    "invoice-holdout-currency-conflict.pdf": "9aec38e47601cc82a90b3f32c834b310cc0f742aaab45385ba8a0f9971d07c59",
+    "invoice-holdout-fr.pdf": "f824bbf4de22a77d4b45d3e660f362ed28c51a926fcee4bf510251c698377850",
+    "invoice-holdout-iso.pdf": "6356dfc167f6e93e40cbaabf780b29a18fb3b80067079dfa55eb99f8fbeb4219",
+    "invoice-holdout-vat.pdf": "c6764e0d6da10392232c16eb545bd4ec096a4f2f693c7047d5a41058a2becf46",
+    "references.json": "c78be8cfd49bb5433b7b2537d895f4017bf6326c44ac0f52e84c9bc2b86633d4"
+  },
+  "primary_fields": ["total", "balance_due", "currency", "issue_date", "due_date"],
+  "scoring": "Compare original OCR v2 and the invoice-specific profile before review; record correct values, wrong values, missing values, correctly blank fields, and unexpected values for fields expected to be blank."
+}

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Essai de saisie des reçus</title>
+<style>
+  :root { color: #152b2d; background: #f4f6f3; font: 16px/1.5 system-ui, sans-serif; }
+  body { max-width: 1080px; margin: 0 auto; padding: 28px; }
+  header { border-bottom: 1px solid #d2ddda; margin-bottom: 24px; }
+  h1 { font-size: clamp(1.6rem, 4vw, 2.5rem); margin: 0 0 14px; }
+  h2 { margin-top: 0; }
+  [hidden] { display: none !important; }
+  .panel { background: white; border: 1px solid #d2ddda; border-radius: 12px; padding: 22px; }
+  #trial { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+  #viewer { text-align: center; max-height: 76vh; overflow: auto; }
+  #receipt { display: block; height: auto; width: auto; max-width: 100%; max-height: 68vh; margin: 12px auto 0; }
+  #viewer.enlarged #receipt { width: min(100%, 680px); max-height: none; }
+  #evidence { border-left: 3px solid #527c6b; padding-left: 12px; overflow-wrap: anywhere; }
+  label { display: block; font-weight: 650; }
+  input { box-sizing: border-box; width: 100%; margin: 6px 0 16px; padding: 10px; font: inherit; border: 1px solid #597674; border-radius: 6px; }
+  button { cursor: pointer; font: inherit; font-weight: 650; border: 1px solid #37675a; border-radius: 6px; padding: 9px 13px; background: #ecf4f0; color: #183831; }
+  button.primary { background: #145b4c; color: white; }
+  button:disabled { opacity: .5; cursor: wait; }
+  :focus-visible { outline: 3px solid #277c6a; outline-offset: 3px; }
+  #error { color: #92291f; min-height: 1.5em; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #d2ddda; }
+  @media (max-width: 740px) {
+    body { padding: 16px; }
+    #trial { grid-template-columns: 1fr; }
+    #receipt { max-height: 55vh; }
+  }
+</style>
+<header><h1>Essai de saisie des reçus</h1></header>
+<section id="intro" class="panel">
+  <h2>Comparer la saisie manuelle et la saisie assistée</h2>
+  <p>Tu verras <span id="receipt-count">20</span> reçus, un par un. Saisis le total à payer dans la devise imprimée. En mode assisté, vérifie le montant proposé sur le reçu avant de le valider.</p>
+  <p>Prévois environ 5 à 10 minutes. Le temps démarre à l’affichage de chaque reçu. Le résultat reste sur cet ordinateur.</p>
+  <button id="start" class="primary">Commencer l’essai</button>
+</section>
+<section id="trial" hidden>
+  <div id="viewer" class="panel">
+    <button id="zoom" type="button" aria-pressed="false">Agrandir le reçu</button>
+    <img id="receipt" alt="Reçu dont il faut relever le montant total">
+  </div>
+  <form id="entry" class="panel">
+    <p id="progress" aria-live="polite"></p>
+    <h2 id="mode"></h2>
+    <p id="hint"></p>
+    <p id="evidence" hidden></p>
+    <label for="amount">Montant total</label>
+    <input id="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="Par exemple 48,00" maxlength="32">
+    <button id="submit" class="primary" type="submit">Valider</button>
+    <button id="skip" type="button">Total illisible</button>
+  </form>
+</section>
+<section id="finish" class="panel" hidden>
+  <h2>Résultats de l’essai</h2>
+  <table>
+    <thead><tr><th scope="col">Indicateur</th><th scope="col">Manuel</th><th scope="col">Assisté</th></tr></thead>
+    <tbody id="metrics"></tbody>
+  </table>
+  <p>Le temps médian exclut les reçus interrompus. L’exactitude porte sur tous les reçus saisis.</p>
+</section>
+<p id="error" role="status"></p>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const key = 'receipt-pilot-session-v1';
+  const activeKey = 'receipt-pilot-active-v1';
+  let current, started, interrupted;
+  $('start').textContent = sessionStorage.getItem(key) ? 'Reprendre l’essai' : 'Commencer l’essai';
+
+  async function request(url, data) {
+    const options = data === undefined ? { cache: 'no-store' } : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    };
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      const result = await res.json();
+      throw new Error(typeof result.detail === 'string' ? result.detail : 'Saisie invalide.');
+    }
+    return res.json();
+  }
+
+  function controls(disabled) {
+    for (const id of ['submit', 'skip', 'amount']) $(id).disabled = disabled;
+  }
+
+  async function show(state) {
+    current = state;
+    sessionStorage.setItem(key, state.session_id);
+    $('start').textContent = 'Reprendre l’essai';
+    if (state.summary) {
+      $('intro').hidden = $('trial').hidden = true;
+      $('finish').hidden = false;
+      const fields = [
+        ['Totaux corrects', (m) => `${m.exact} sur ${m.count}`],
+        ['Totaux faux', (m) => m.wrong],
+        ['Totaux laissés illisibles', (m) => m.unreadable],
+        ['Temps médian par reçu', (m) => m.median_seconds === null ? '—' : `${m.median_seconds.toLocaleString('fr-FR')} s`],
+        ['Temps total chronométré', (m) => m.total_seconds === undefined ? '—' : `${m.total_seconds.toLocaleString('fr-FR')} s`],
+        ['Reçus chronométrés', (m) => m.timed],
+      ];
+      $('metrics').replaceChildren();
+      for (const [label, value] of fields) {
+        const row = $('metrics').insertRow();
+        const heading = document.createElement('th');
+        heading.scope = 'row';
+        heading.textContent = label;
+        row.append(heading);
+        for (const mode of ['manual', 'assisted']) row.insertCell().textContent = value(state.summary[mode]);
+      }
+      sessionStorage.removeItem(activeKey);
+      return;
+    }
+    $('trial').hidden = true;
+    started = undefined;
+    controls(true);
+    const assisted = state.mode === 'assisted';
+    $('progress').textContent = `Reçu ${state.index + 1} sur ${state.size}`;
+    $('mode').textContent = assisted ? 'Saisie assistée' : 'Saisie manuelle';
+    $('hint').textContent = assisted && state.proposal === null
+      ? 'Aucun montant proposé. Relève le total sur le reçu.'
+      : assisted ? 'Vérifie le montant prérempli et corrige-le si nécessaire.' : 'Relève le total sur le reçu.';
+    $('evidence').textContent = (state.evidence || []).join(' · ');
+    $('evidence').hidden = !$('evidence').textContent;
+    $('amount').value = assisted && state.proposal !== null ? state.proposal.replace('.', ',') : '';
+    $('viewer').classList.remove('enlarged');
+    $('viewer').scrollTop = 0;
+    $('zoom').setAttribute('aria-pressed', 'false');
+    $('zoom').textContent = 'Agrandir le reçu';
+    $('receipt').src = state.image_url;
+    await $('receipt').decode();
+    const trialKey = `${state.session_id}/${state.index}`;
+    interrupted = document.hidden || sessionStorage.getItem(activeKey) === trialKey;
+    sessionStorage.setItem(activeKey, trialKey);
+    $('intro').hidden = true;
+    $('trial').hidden = false;
+    started = performance.now();
+    controls(false);
+  }
+
+  async function openStudy(id) {
+    await show(await request(id ? `/sessions/${id}` : '/sessions', id ? undefined : {}));
+  }
+
+  $('start').addEventListener('click', async () => {
+    $('start').disabled = true;
+    $('error').textContent = '';
+    try { await openStudy(sessionStorage.getItem(key)); }
+    catch (error) { $('error').textContent = error.message; }
+    finally { $('start').disabled = false; }
+  });
+
+  async function submit(amount) {
+    if (started === undefined) return;
+    const elapsed_ms = Math.max(1, Math.round(performance.now() - started));
+    controls(true);
+    $('error').textContent = '';
+    try {
+      await show(await request(`/sessions/${current.session_id}/answers`, {
+        index: current.index, amount, elapsed_ms: Math.min(elapsed_ms, 3600000),
+        interrupted: interrupted || elapsed_ms > 3600000,
+      }));
+    } catch (error) {
+      $('error').textContent = error.message;
+      if (started === undefined) $('intro').hidden = false;
+      else controls(false);
+    }
+  }
+
+  $('entry').addEventListener('submit', (event) => {
+    event.preventDefault();
+    submit($('amount').value);
+  });
+  $('skip').addEventListener('click', () => submit(null));
+  $('zoom').addEventListener('click', () => {
+    const zoom = $('viewer').classList.toggle('enlarged');
+    $('zoom').setAttribute('aria-pressed', String(zoom));
+    $('zoom').textContent = zoom ? 'Réduire le reçu' : 'Agrandir le reçu';
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && started !== undefined) interrupted = true;
+  });
+</script>
+</html>

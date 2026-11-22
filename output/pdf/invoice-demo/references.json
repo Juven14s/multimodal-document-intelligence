@@ -1,0 +1,139 @@
+[
+  {
+    "id": "invoice-office",
+    "file": "invoice-office.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "NORTHBRIDGE OFFICE SUPPLIES",
+      "document_number": "NB-101",
+      "issue_date": "2026-11-13",
+      "due_date": "2026-12-13",
+      "currency": "EUR",
+      "subtotal": "100.00",
+      "tax": "20.00",
+      "total": "120.00"
+    },
+    "line_items": [
+      {
+        "description": "Archive boxes",
+        "quantity": "2",
+        "unit_price": "25.00",
+        "amount": "50.00"
+      },
+      {
+        "description": "Desk organisers",
+        "quantity": "1",
+        "unit_price": "50.00",
+        "amount": "50.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-part-payment",
+    "file": "invoice-part-payment.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "REDBRIDGE MAINTENANCE SERVICES",
+      "document_number": "RM-204",
+      "issue_date": "2026-11-14",
+      "due_date": "2026-12-14",
+      "currency": "EUR",
+      "subtotal": "250.00",
+      "tax": "50.00",
+      "total": "300.00",
+      "balance_due": "200.00"
+    },
+    "line_items": [
+      {
+        "description": "Quarterly equipment service",
+        "quantity": "1",
+        "unit_price": "200.00",
+        "amount": "200.00"
+      },
+      {
+        "description": "Service kit",
+        "quantity": "1",
+        "unit_price": "50.00",
+        "amount": "50.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-scan",
+    "file": "invoice-scan.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": true,
+    "fields": {
+      "merchant_name": "WESTFIELD PRINT STUDIO",
+      "document_number": "WP-308",
+      "issue_date": "2026-11-15",
+      "due_date": "2026-12-15",
+      "currency": "GBP",
+      "subtotal": "90.00",
+      "tax": "18.00",
+      "total": "108.00"
+    },
+    "line_items": [
+      {
+        "description": "Workshop manuals",
+        "quantity": "3",
+        "unit_price": "25.00",
+        "amount": "75.00"
+      },
+      {
+        "description": "Cover prints",
+        "quantity": "1",
+        "unit_price": "15.00",
+        "amount": "15.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-multipage",
+    "file": "invoice-multipage.pdf",
+    "pages": 2,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "MAPLE RIDGE WORKSPACE SERVICES",
+      "document_number": "MW-412",
+      "issue_date": "2026-11-16",
+      "due_date": "2026-12-16",
+      "currency": "EUR",
+      "subtotal": "350.00",
+      "tax": "70.00",
+      "total": "420.00"
+    },
+    "line_items": [
+      {
+        "description": "Workspace inspection",
+        "quantity": "2",
+        "unit_price": "75.00",
+        "amount": "150.00"
+      },
+      {
+        "description": "Site access setup",
+        "quantity": "1",
+        "unit_price": "50.00",
+        "amount": "50.00"
+      },
+      {
+        "description": "Safety labels",
+        "quantity": "5",
+        "unit_price": "10.00",
+        "amount": "50.00"
+      },
+      {
+        "description": "Follow-up visit",
+        "quantity": "1",
+        "unit_price": "100.00",
+        "amount": "100.00"
+      }
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+.git
+.venv
+artifacts
+data
+tmp
+**/__pycache__
+**/*.pyc
+.coverage
+.pytest_cache
+.ruff_cache
+.env
+.env.*
+dist
+build

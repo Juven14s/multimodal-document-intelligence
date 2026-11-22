@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling>=1.27,<2.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multimodal-document-intelligence"
+version = "0.1.0"
+description = "Reliable multimodal extraction from receipts and invoices with human review."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "pydantic>=2.10,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.27,<1.0",
+    "pytest>=8.3,<10.0",
+    "pytest-cov>=6.0,<8.0",
+    "ruff>=0.8,<1.0",
+]
+data = [
+    "datasets>=3.0,<5.0",
+    "pillow>=11.0,<13.0",
+]
+ocr = [
+    "numpy>=1.26,<3.0",
+    "pillow>=11.0,<13.0",
+    "pymupdf>=1.25,<2.0",
+    "pytesseract>=0.3.13,<1.0",
+]
+api = [
+    "fastapi>=0.115,<1.0",
+    "python-multipart>=0.0.18,<1.0",
+    "uvicorn[standard]>=0.34,<1.0",
+]
+ui = ["gradio>=5.0,<7.0"]
+vlm = [
+    "accelerate>=1.0,<2.0",
+    "torch>=2.5,<3.0",
+    "transformers>=5.20,<6.0",
+]
+finetune = ["peft>=0.14,<1.0"]
+mlops = ["mlflow>=3.0,<4.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/document_intelligence"]
+
+[project.scripts]
+docintel-prepare = "document_intelligence.data.prepare:main"
+docintel-preprocess = "document_intelligence.preprocessing.cli:main"
+docintel-ocr = "document_intelligence.ocr.cli:main"
+docintel-evaluate = "document_intelligence.evaluation.cli:main"
+docintel-vlm = "document_intelligence.vlm.cli:main"
+docintel-build-fewshot = "document_intelligence.vlm.examples:main"
+docintel-calibrate = "document_intelligence.uncertainty.cli:main"
+docintel-review-ui = "document_intelligence.ui.app:main"
+docintel-api = "document_intelligence.api.cli:main"
+docintel-benchmark = "document_intelligence.evaluation.benchmark:main"
+docintel-qwen-experiment = "document_intelligence.evaluation.qwen_experiment:main"
+docintel-export-sft = "document_intelligence.finetuning.dataset:main"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --cov=document_intelligence --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

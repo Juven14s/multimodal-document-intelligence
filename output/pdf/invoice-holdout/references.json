@@ -1,0 +1,150 @@
+[
+  {
+    "id": "invoice-holdout-vat",
+    "file": "invoice-holdout-vat.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "CEDAR VALLEY ELECTRICAL",
+      "document_number": "CV-713",
+      "issue_date": "2026-10-17",
+      "due_date": "2026-11-22",
+      "currency": "GBP",
+      "subtotal": "220.00",
+      "tax": "44.00",
+      "total": "264.00",
+      "balance_due": "184.00"
+    },
+    "line_items": [
+      {
+        "description": "Lighting installation",
+        "quantity": "2",
+        "unit_price": "90.00",
+        "amount": "180.00"
+      },
+      {
+        "description": "Safety check",
+        "quantity": "1",
+        "unit_price": "40.00",
+        "amount": "40.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-holdout-balance-only",
+    "file": "invoice-holdout-balance-only.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "COASTLINE STORAGE SERVICES",
+      "document_number": "CS-820",
+      "issue_date": "2026-10-18",
+      "due_date": "2026-11-23",
+      "currency": "EUR",
+      "subtotal": null,
+      "tax": null,
+      "total": null,
+      "balance_due": "84.00"
+    },
+    "line_items": [
+      {
+        "description": "Storage renewal",
+        "quantity": "1",
+        "unit_price": "95.00",
+        "amount": "95.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-holdout-iso",
+    "file": "invoice-holdout-iso.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "ORCHARD TECHNICAL SUPPORT",
+      "document_number": "EUR-921",
+      "issue_date": "2026-10-19",
+      "due_date": "2026-11-24",
+      "currency": "USD",
+      "subtotal": "340.00",
+      "tax": "34.00",
+      "total": "374.00",
+      "balance_due": null
+    },
+    "line_items": [
+      {
+        "description": "Remote support",
+        "quantity": "4",
+        "unit_price": "70.00",
+        "amount": "280.00"
+      },
+      {
+        "description": "Setup review",
+        "quantity": "1",
+        "unit_price": "60.00",
+        "amount": "60.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-holdout-fr",
+    "file": "invoice-holdout-fr.pdf",
+    "pages": 1,
+    "document_type": "invoice",
+    "raster_only": true,
+    "fields": {
+      "merchant_name": "ATELIER DU BELVEDERE",
+      "document_number": "AB-731",
+      "issue_date": "2026-10-20",
+      "due_date": "2026-11-25",
+      "currency": "EUR",
+      "subtotal": "320.00",
+      "tax": "64.00",
+      "total": "384.00",
+      "balance_due": "324.00"
+    },
+    "line_items": [
+      {
+        "description": "Entretien du mobilier",
+        "quantity": "2",
+        "unit_price": "160.00",
+        "amount": "320.00"
+      }
+    ]
+  },
+  {
+    "id": "invoice-holdout-currency-conflict",
+    "file": "invoice-holdout-currency-conflict.pdf",
+    "pages": 2,
+    "document_type": "invoice",
+    "raster_only": false,
+    "fields": {
+      "merchant_name": "HILLSIDE DOCUMENT SERVICES",
+      "document_number": "HD-842",
+      "issue_date": "2026-10-21",
+      "due_date": "2026-11-26",
+      "currency": null,
+      "subtotal": "130.00",
+      "tax": "26.00",
+      "total": "156.00",
+      "balance_due": null
+    },
+    "line_items": [
+      {
+        "description": "Archive preparation",
+        "quantity": "1",
+        "unit_price": "70.00",
+        "amount": "70.00"
+      },
+      {
+        "description": "Digitisation",
+        "quantity": "2",
+        "unit_price": "30.00",
+        "amount": "60.00"
+      }
+    ]
+  }
+]

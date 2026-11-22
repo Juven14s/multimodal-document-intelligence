@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.md whitespace=-blank-at-eol
+*.pdf binary
+output/pdf/invoice-holdout/references.json -text whitespace=cr-at-eol

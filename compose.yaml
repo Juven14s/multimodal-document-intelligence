@@ -1,0 +1,79 @@
+services:
+  mlflow:
+    build: .
+    command:
+      - mlflow
+      - server
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --allowed-hosts
+      - mlflow:5000,localhost:*,127.0.0.1:*
+      - --backend-store-uri
+      - sqlite:////app/artifacts/mlflow.db
+      - --default-artifact-root
+      - /app/artifacts/mlruns
+    ports:
+      - "127.0.0.1:${DOCINTEL_MLFLOW_PORT:-5000}:5000"
+    volumes:
+      - docintel-artifacts:/app/artifacts
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    command: ["docintel-api", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      DOCINTEL_ARTIFACTS_DIR: /app/artifacts
+      DOCINTEL_REVIEW_DATABASE: /app/artifacts/review/review.sqlite3
+      DOCINTEL_CALIBRATION_PROFILE: ${DOCINTEL_CALIBRATION_PROFILE:-}
+      DOCINTEL_OCR_INVOICE_RULES: ${DOCINTEL_OCR_INVOICE_RULES:-true}
+      DOCINTEL_REQUIRE_CALIBRATION: "true"
+      GIT_PYTHON_REFRESH: quiet
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    ports:
+      - "127.0.0.1:${DOCINTEL_API_PORT:-8010}:8000"
+    volumes:
+      - docintel-artifacts:/app/artifacts
+      - ./artifacts/calibration:/app/calibration:ro
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  review-ui:
+    build: .
+    command:
+      - docintel-review-ui
+      - --database
+      - /app/artifacts/review/review.sqlite3
+      - --host
+      - 0.0.0.0
+      - --port
+      - "7860"
+    ports:
+      - "127.0.0.1:${DOCINTEL_UI_PORT:-7860}:7860"
+    volumes:
+      - docintel-artifacts:/app/artifacts
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  docintel-artifacts:
